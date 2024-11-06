@@ -12,10 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RainbowTable {
 
-    private final int tableSize;
-    private final int chainSize;
-    private final int passwordSize;
-    private final ConcurrentHashMap<String, String> table;
+    private int tableSize;
+    private int chainSize;
+    private int passwordSize;
+    private ConcurrentHashMap<String, String> table;
 
     RainbowTable(int tableSize, int chainSize, int passwordSize) {
         this.tableSize = tableSize;
@@ -52,7 +52,7 @@ public class RainbowTable {
 
         });
 
-        //we have to it call one last time for 100%
+        //we have to call it one last time for 100%
         Util.progressBar(progressCounter, progressBarLength, totalPasswords);
 
         System.out.println("\ngenerated in : " + (System.currentTimeMillis() - startTime) / 1000 + "s");
@@ -80,11 +80,8 @@ public class RainbowTable {
     }
 
 
-    public static RainbowTable loadTable(String filePath) {
+    RainbowTable(String filePath) {
         Path path = Path.of(filePath);
-        int tableSize;
-        int chainSize;
-        int passwordSize;
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             // Read first line for table parameters
@@ -95,11 +92,10 @@ public class RainbowTable {
                 throw new IOException("Invalid format in the first line. Expected 3 values.");
             }
 
-            tableSize = Integer.parseInt(sizes[0].trim());
-            chainSize = Integer.parseInt(sizes[1].trim());
-            passwordSize = Integer.parseInt(sizes[2].trim());
-
-            RainbowTable rainbowTable = new RainbowTable(tableSize, chainSize, passwordSize);
+            tableSize = Integer.parseInt(sizes[0]);
+            chainSize = Integer.parseInt(sizes[1]);
+            passwordSize = Integer.parseInt(sizes[2]);
+            table = new ConcurrentHashMap<>(tableSize);
 
             // Read the table entries
             String line;
@@ -108,14 +104,12 @@ public class RainbowTable {
                 if (parts.length == 2) {
                     String hash = parts[0].trim();
                     String password = parts[1].trim();
-                    rainbowTable.table.put(hash, password);
+                    this.table.put(hash, password);
                 }
             }
-            return rainbowTable;
         } catch (IOException e) {
             System.out.println("Please generate a rainbow table before running an attack.");
             System.exit(1);
-            return null;
         }
     }
 

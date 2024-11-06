@@ -79,6 +79,7 @@ public class RainbowAttack {
             return new ArrayList<>(Files.readAllLines(Path.of(path)));
         }catch (Exception e){
             System.out.println("Please put the hash file you want to attack in this directory.");
+            System.out.println("Note: file should be in txt format and each line should be a new hash.");
             System.exit(1);
             return null;
         }
