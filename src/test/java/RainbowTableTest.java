@@ -6,14 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RainbowTableTest {
     public RainbowTable rainbowTable;
-    private static final int TABLE_SIZE = 3000000;
-    private static final int CHAIN_SIZE = 2000;
+    private static final int TABLE_SIZE = 1000000;
+    private static final int CHAIN_SIZE = 1000;
     private static final int PASSWORD_SIZE = 6;
-
 
     @BeforeEach
     void setUp() {
         rainbowTable = new RainbowTable(TABLE_SIZE, CHAIN_SIZE, PASSWORD_SIZE);
+        //rainbowTable.genTable();
     }
 
     @Test
@@ -45,8 +45,8 @@ public class RainbowTableTest {
             //System.out.println("Iteration " + i + " - Hash: " + hash + ", Reduction: " + reduced);
         }
 
-        String finalHash = DigestUtils.sha256Hex(reduced);
-        String finalReduced = Util.reduce(finalHash, CHAIN_SIZE - 1, PASSWORD_SIZE);
+        String finalHash = hash;
+        String finalReduced = reduced;
 
         hash = DigestUtils.sha256Hex(password);
         reduced = Util.reduce(hash, 0, PASSWORD_SIZE);
@@ -62,4 +62,9 @@ public class RainbowTableTest {
         assertEquals(finalReduced, Util.reduce(finalHash, CHAIN_SIZE - 1, PASSWORD_SIZE), "Hash-reduction chain is inconsistent!");
     }
 
+//    @Test
+//    void attackTest() throws IOException {
+//
+//        RainbowAttack.crack(List.of("047828a55e4e95f5e22190b15d28f6833026835e4a61df6dd3b2a37841a52196"),rainbowTable);
+//    }
 }

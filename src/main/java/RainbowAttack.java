@@ -21,7 +21,7 @@ public class RainbowAttack {
         int progressBarLength = 50;
 
         hashes.parallelStream().forEach((hash_) -> {
-            for (int i = 1; i < table.getChainSize(); i++) {
+            for (int i = 0; i < table.getChainSize(); i++) {
 
                 String hash = hash_;
                 String reduced = Util.reduce(hash, table.getChainSize() - i - 1, table.getPasswordSize());
@@ -31,8 +31,7 @@ public class RainbowAttack {
                     hash = DigestUtils.sha256Hex(reduced);
                     reduced = Util.reduce(hash, j, table.getPasswordSize());
                 }
-                checkHash(table, hash_, reduced);
-
+                if(checkHash(table, hash_, reduced)) break;
             }
 
             if (progressCounter.get() % 10 == 0 ) {
@@ -47,7 +46,7 @@ public class RainbowAttack {
         System.out.println("\nAttack finished in : " + ((System.currentTimeMillis() - start) / 1000) + "s");
     }
 
-    private static void checkHash(RainbowTable table, String hash_, String reduced) {
+    private static boolean checkHash(RainbowTable table, String hash_, String reduced) {
         String potential = table.getTable().get(reduced);
         if (potential != null) {
             String hashCheck;
@@ -57,12 +56,13 @@ public class RainbowAttack {
                 if (hashCheck.equals(hash_)) {
                     // We have found the password hash
                     foundHash.put(hash_,potential);
-                    break;
+                    return true;
                 }
                 // Reduce the hash to move to the next step of the chain
                 potential = Util.reduce(hashCheck, j, table.getPasswordSize());
             }
         }
+        return false;
     }
 
 
